@@ -24,7 +24,7 @@ public class Filter {
                 .option("header", true)
                 .csv("C:\\Users\\admin\\Downloads\\sparkAssingment\\sparkAssingment\\src\\main\\resources\\heart.csv");
 
-        String expression ="trestbps<chol";
+        String expression ="age > 50 AND trestbps > 140 AND CP = 0";
 
         dataset = dataset.withColumn("finalvalue", functions.expr(expression));
         dataset.show();

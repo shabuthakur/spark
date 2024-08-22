@@ -7,6 +7,7 @@ import org.apache.spark.ml.PipelineModel;
 import org.apache.spark.ml.PipelineStage;
 import org.apache.spark.ml.feature.OneHotEncoder;
 import org.apache.spark.ml.feature.StringIndexer;
+import org.apache.spark.ml.feature.StringIndexerModel;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -30,25 +31,30 @@ public class OneHotEncoding {
                 .option("header", true)
                 .csv("C:\\Users\\admin\\Downloads\\sparkAssingment\\sparkAssingment\\src\\main\\resources\\heart.csv");
 
+        StringIndexer indexerCP = new StringIndexer()
+                .setInputCol("cp")
+                .setOutputCol("CPIndex");
 
-        StringIndexer indexer = new StringIndexer()
-                .setInputCol("slope")
-                .setOutputCol("index");
+        OneHotEncoder encoderCP = new OneHotEncoder()
+                .setInputCol("CPIndex")
+                .setOutputCol("CPVec");
 
-        OneHotEncoder encoder = new OneHotEncoder()
-                .setInputCol("index")
-                .setOutputCol("vector");
 
-        Pipeline pipeline = new Pipeline().setStages(new PipelineStage[]{indexer, encoder});
+        Pipeline pipeline = new Pipeline()
+                .setStages(new PipelineStage[]{
+                        indexerCP, encoderCP,
+                });
+
+
         PipelineModel model = pipeline.fit(dataset);
         Dataset<Row> encodedDf = model.transform(dataset);
 
         encodedDf.show();
 
-        dataset.write()
+        encodedDf.write()
                 .option("header", true)
                 .mode("overwrite")
-                .csv("C:\\Users\\admin\\Downloads\\sparkAssingment\\sparkAssingment\\output\\one_hot_encoding");
+                .parquet("C:\\Users\\admin\\Downloads\\sparkAssingment\\sparkAssingment\\output\\one-hot-encoding");
 
         spark.stop();
 
