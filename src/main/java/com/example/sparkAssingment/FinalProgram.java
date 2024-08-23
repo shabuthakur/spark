@@ -35,25 +35,29 @@ public class FinalProgram {
         // One-Hot Encoding
         StringIndexer indexerCP = new StringIndexer()
                 .setInputCol("cp")
-                .setOutputCol("CPIndex");
+                .setOutputCol("Index");
 
         OneHotEncoder encoderCP = new OneHotEncoder()
-                .setInputCol("CPIndex")
-                .setOutputCol("CPVec");
+                .setInputCol("Index")
+                .setOutputCol("Vector");
 
         Pipeline pipeline = new Pipeline()
                 .setStages(new PipelineStage[]{indexerCP, encoderCP});
 
-        // Feature Derivation
-        dataset = dataset.withColumn("powerOfTrestbps", functions.pow(dataset.col("trestbps"), 2));
 
         PipelineModel model = pipeline.fit(dataset);
         dataset = model.transform(dataset);
 
+        dataset.show();
+
+        // Feature Derivation
+        dataset = dataset.withColumn("powerOfTrestbps", functions.pow(dataset.col("trestbps"), 2));
+
+
+
         // Filter
         dataset = dataset.filter(dataset.col("age").gt(50)
-                .and(dataset.col("trestbps").gt(140))
-                .and(dataset.col("CP").equalTo(0)));
+                .and(dataset.col("trestbps").gt(140)));
 
         // Quantize
         dataset = dataset.withColumn("cholesterol_level",
@@ -62,8 +66,8 @@ public class FinalProgram {
                         .otherwise("High"));
 
         // Reduce
-        Long count = dataset.filter(dataset.col("cholesterol_level").equalTo("Low")).count();
-        System.out.println("Low risk: " + count);
+        Long count = dataset.filter(dataset.col("cholesterol_level").equalTo("High")).count();
+        System.out.println("High risk: " + count);
 
         dataset.show();
 
@@ -75,8 +79,8 @@ public class FinalProgram {
             }
         }, DataTypes.StringType);
 
-        Dataset<Row> convertedDf = dataset.withColumn("CPVector",
-                functions.callUDF("vectorToString", dataset.col("CPVec")));
+        Dataset<Row> convertedDf = dataset.withColumn("Vector",
+                functions.callUDF("vectorToString", dataset.col("Vector")));
 
         convertedDf = convertedDf.drop("CPVec");
 
