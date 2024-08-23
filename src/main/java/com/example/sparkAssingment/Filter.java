@@ -22,11 +22,13 @@ public class Filter {
 
         Dataset<Row> dataset = spark.read()
                 .option("header", true)
-                .csv("C:\\Users\\admin\\Downloads\\sparkAssingment\\sparkAssingment\\src\\main\\resources\\heart.csv");
+                .csv("C:\\Users\\admin\\Downloads\\sparkAssingment\\sparkAssingment\\output\\heart.csv");
 
-        String expression ="age > 50 AND trestbps > 140 AND CP = 0";
+//        String expression ="age > 50 AND trestbps > 140 AND CP = 0"; // new data set bnana hai
 
-        dataset = dataset.withColumn("finalvalue", functions.expr(expression));
+        dataset =dataset.filter(dataset.col("age").gt(50)
+                .and(dataset.col("trestbps").gt(140))
+                .and(dataset.col("CP").equalTo(0)));
         dataset.show();
 
         dataset.write()

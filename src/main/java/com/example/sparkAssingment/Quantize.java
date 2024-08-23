@@ -26,7 +26,7 @@ public class Quantize {
 
         Dataset<Row> dataset = spark.read()
                 .option("header", true)
-                .csv("C:\\Users\\admin\\Downloads\\sparkAssingment\\sparkAssingment\\src\\main\\resources\\heart.csv");
+                .csv("C:\\Users\\admin\\Downloads\\sparkAssingment\\sparkAssingment\\output\\filter");
 
 
         dataset = dataset.withColumn("cholesterol_level",
@@ -36,6 +36,7 @@ public class Quantize {
 
 
         dataset.show();
+// ohe ->filter ->quantize ->reduce
 
         dataset.write().mode("overwrite")
                 .csv("C:\\Users\\admin\\Downloads\\sparkAssingment\\sparkAssingment\\output\\Quantize");
